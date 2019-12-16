@@ -1,0 +1,97 @@
+---
+- name: WordPress
+  hosts: all
+  become: yes
+
+  vars:
+
+    
+  tasks:
+
+  - name: enable comunity repos
+    copy:
+      src: ./files/repositories
+      dest: /etc/apk/
+      force: yes
+      owner: root
+      group: root
+      mode: '0644'
+
+
+
+
+
+  - name: install apk packages
+    apk:
+      name: php7, mysql, apache2, php7-apache2, php7-mysqli
+      state: present
+      update_cache: yes
+
+  - name: Create download  directory if it does not exist
+    file:
+      path: "/root/download"
+      state: directory
+      mode: '0440'
+
+  
+  - name: download wordpress
+    tags: download
+    get_url:
+      url: https://wordpress.org/latest.tar.gz
+      dest: /root/download/
+      mode: 0440
+
+  - name: get last downloaded file name
+    shell:
+      cmd: cd /root/download && ls -t wordpress* | head -1
+    register: wp_tar_file
+
+
+  - name: Last version is...
+    debug: var=wp_tar_file.stdout
+
+
+
+  - name: Extract wordpress
+    shell:
+      cmd: tar xvzf /root/download/{{wp_tar_file.stdout}} -C /var/www/
+
+  - name: Set DocumentRoot to wordpress root
+    tags:
+      - regex
+    replace:
+      backup: yes
+      path: /etc/apache2/httpd.conf
+      regexp: "DocumentRoot \".*?\""
+      replace: "DocumentRoot \"/var/www/wordpress\""
+
+      
+  - name: Copy file with owner and permissions
+    tags:
+      - regex
+    copy:
+      src: ./wordpress_dir.conf
+      dest: "/etc/apache2/conf.d/"
+#     owner: root
+#     group: root
+      mode: '0644'
+
+
+  - name: Start service httpd, if not started
+    service:
+      name: httpd
+      state: started
+
+## get error with unarchive module
+# TASK [Unarchive a file that needs to be downloaded (added in 2.0)] ************************************************************************************
+# fatal: [wp_host2]: FAILED! => {"changed": false, "msg": "Failed to find handler for \"/root/.ansible/tmp/ansible-tmp-1576373845.09-37819945379153/latest.tarqrcbah7o.gz\". Make sure the required command to extract the file is installed. Command \"/usr/bin/unzip\" could not handle archive. Command \"/bin/tar\" detected as tar type None. GNU tar required."}
+# fatal: [wp_host1]: FAILED! => {"changed": false, "msg": "Failed to find handler for \"/root/.ansible/tmp/ansible-tmp-1576373845.07-10548604634175/latest.tartcr2uuxm.gz\". Make sure the required command to extract the file is installed. Command \"/usr/bin/unzip\" could not handle archive. Command \"/bin/tar\" detected as tar type None. GNU tar required."
+# }
+  # - name: Unarchive a file that needs to be downloaded (added in 2.0)
+  #   unarchive:
+  #     src: https://wordpress.org/latest.tar.gz
+  #     dest: /root/wordpress/
+  #     remote_src: yes
+
+
+...
