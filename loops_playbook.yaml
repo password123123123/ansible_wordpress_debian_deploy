@@ -1,0 +1,52 @@
+---
+- name: loops
+  hosts: 127.0.0.1
+
+  vars:
+    - file_content: "{{ lookup('file', 'ansible.cfg') }}"
+
+    - env_var: "{{lookup('env','PATH')}}"
+
+  tasks:
+
+  - name: print some shit
+    debug: msg="Get ready to {{item}}"
+    loop:
+      - rumble
+      - bumble
+      - shit
+      - frost
+
+  - name: filters...
+    debug:
+      msg: '{{"hello world!" | upper}}'
+
+#  error-proof синтаксис
+
+
+#Область видимости?
+  -
+    debug: msg = '{{"happy gallerieng, bitch !" | wordcount}}'
+
+  -
+    debug: msg= '{{"happy gallerieng, bitch !" | wordcount}}'
+
+  -
+    debug: msg='{{"happy gallerieng, bitch !" | wordcount}}'
+
+###################################
+
+  -
+    debug:
+      msg: "{{ file_content }}"
+
+  -
+    debug:
+      msg: "{{ env_var }}"
+    
+  -
+    debug:
+      msg: "{{[3,5,7,1,2,4] | min}}"
+
+
+...
