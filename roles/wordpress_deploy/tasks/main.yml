@@ -16,7 +16,7 @@
 
   - name: install apk packages
     apk:
-      name: php7, mysql, apache2, php7-apache2, php7-mysqli
+      name: php7, mysql, apache2, php7-apache2, php7-mysqli, php7-json
       state: present
       update_cache: yes
 
