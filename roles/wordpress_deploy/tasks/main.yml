@@ -2,12 +2,14 @@
 # tasks file for wordpress_deploy
 
   - name: install packages (unified)
+    tags: package
     package:
       name:
         - php
         - default-mysql-server
         - apache2
         - php-mysql
+        - python-pymysql
       state: latest
 
   - name: Create download  directory if it does not exist
@@ -76,3 +78,25 @@
     service:
       name: apache2
       state: started
+
+############# MySql config
+# Я приконектился к mysql и руками убрал значение в ячейке plugin для user=root, ибо оно не хотело давать доступ питону с локалхоста ноды (?)
+
+# Disable the Auth Plugin
+
+# use mysql;
+# update user set plugin='' where User='root';
+
+
+
+  - name: create wordpress mysql user
+    tags: mysql
+    mysql_user:
+      name: wordpress
+      password: 12345
+      priv: 'wordpress.*:ALL'
+      state: present
+
+
+  
+############# end MySql config
