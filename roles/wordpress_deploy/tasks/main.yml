@@ -88,15 +88,23 @@
 # update user set plugin='' where User='root';
 
 
-
   - name: create wordpress mysql user
     tags: mysql
     mysql_user:
-      name: wordpress
-      password: 12345
+      name: "{{mysql_wordpress_user}}"
+      password: "{{mysql_wordpress_password}}"
       priv: 'wordpress.*:ALL'
       state: present
-
-
-  
 ############# end MySql config
+
+  - name: print vars
+    tags: debug
+    debug:
+      var: mysql_wordpress_user
+
+
+  - name: generate and upload template
+    tags: debug
+    template:
+      src: ./roles/wordpress_deploy/files/wp-config.php
+      dest: /var/www/wordpress/

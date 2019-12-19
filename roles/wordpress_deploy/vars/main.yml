@@ -1,2 +1,7 @@
 ---
 # vars file for wordpress_deploy
+
+mysql_wordpress_db_name: "wordpress"
+mysql_wordpress_user: "wordpress"
+mysql_wordpress_password: "12345"
+
