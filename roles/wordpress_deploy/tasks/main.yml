@@ -95,6 +95,13 @@
       password: "{{mysql_wordpress_password}}"
       priv: 'wordpress.*:ALL'
       state: present
+
+  - name: adding wordpress db
+    tags: mysql
+    mysql_db:
+      name: "{{mysql_wordpress_db_name}}"
+      state: present
+  
 ############# end MySql config
 
   - name: print vars
